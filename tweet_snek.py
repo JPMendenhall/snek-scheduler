@@ -1,38 +1,28 @@
-import os
+import tweepy
 import csv
 import datetime
-import tweepy
+import os
 
-# OAuth 1.0a (v1.1-compatible) – use your existing tokens
+# Auth
 auth = tweepy.OAuth1UserHandler(
-    os.environ["TWITTER_API_KEY"],
-    os.environ["TWITTER_API_SECRET"],
-    os.environ["TWITTER_ACCESS_TOKEN"],
-    os.environ["TWITTER_ACCESS_SECRET"]
+    os.environ['API_KEY'],
+    os.environ['API_SECRET'],
+    os.environ['ACCESS_TOKEN'],
+    os.environ['ACCESS_TOKEN_SECRET']
 )
-
 api = tweepy.API(auth)
 
-# Format date
+# Get today’s date formatted like "May 22, 2025"
 today = datetime.datetime.utcnow().strftime('%b %d, %Y')
 
-contract = "0x22b0414cce0593ee1a87d83f91f569d505de9160"
-
-# Read today's Snek from CSV
-with open("snek_captions.csv", newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
+# Read the CSV and find the row matching today's date
+with open('snek_captions.csv', newline='', encoding='utf-8') as csvfile:
+    reader = csv.DictReader(csvfile)
     for row in reader:
-        if row["date"].strip() == today:
-            caption = row["caption"]
-            file_name = row["file_name"]
-            token_id = file_name.replace("snek_", "").replace(".png", "")
-            opensea_url = f"https://opensea.io/item/base/{contract}/{token_id}"
-            tweet = f"{caption}\n{opensea_url}"
-            try:
-                api.update_status(tweet)
-                print("✅ Tweet sent.")
-            except Exception as e:
-                print("❌ Twitter post failed:", e)
+        if row['date'] == today:
+            caption = row['caption']
+            token_id = row['file_name'].split('_')[1].split('.')[0]
+            token_url = f"https://opensea.io/assets/base/0x22b0414cce0593ee1a87d83f91f569d505de9160/{token_id}"
+            tweet_text = f"{caption}\n{token_url}"
+            api.update_status(status=tweet_text)
             break
-    else:
-        print("⚠️ No matching date in CSV.")
