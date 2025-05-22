@@ -1,10 +1,9 @@
-# tweet_snek.py
 import os
 import csv
 import datetime
 import tweepy
 
-# Set up Twitter auth from environment
+# Twitter auth
 auth = tweepy.OAuth1UserHandler(
     os.environ['TWITTER_API_KEY'],
     os.environ['TWITTER_API_SECRET'],
@@ -13,25 +12,28 @@ auth = tweepy.OAuth1UserHandler(
 )
 api = tweepy.API(auth)
 
-# Get today's date in the format used in the CSV
+# Today's date format (e.g., "May 17, 2025")
 today = datetime.datetime.utcnow().strftime('%b %d, %Y')
 print(f"Today's date is: {today}")
 
-# Read the CSV
+# Contract address for Sneks
+contract_address = "0x22b0414cce0593ee1a87d83f91f569d505de9160"
+
+# Find today's row
 with open('snek_captions.csv', newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
-        print(f"Checking row with date: {row['date']}")
         if row['date'].strip() == today:
             caption = row['caption']
-            image_path = os.path.join('images', row['file_name'])
-            print(f"Posting {image_path} with caption: {caption}")
+            file_name = row['file_name']  # e.g., snek_114.png
+            token_id = file_name.replace("snek_", "").replace(".png", "")
+            url = f"https://opensea.io/item/base/{contract_address}/{token_id}"
+            full_tweet = f"{caption}\n{url}"
             try:
-                media = api.media_upload(image_path)
-                api.update_status(status=caption, media_ids=[media.media_id])
-                print("Tweet posted successfully.")
+                api.update_status(full_tweet)
+                print("✅ Tweet posted successfully.")
             except Exception as e:
-                print("Twitter post failed:", e)
+                print("❌ Twitter post failed:", e)
             break
     else:
         print(f"No Snek scheduled for today ({today})")
