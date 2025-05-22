@@ -5,11 +5,12 @@ import os
 
 # Auth
 auth = tweepy.OAuth1UserHandler(
-    os.environ['API_KEY'],
-    os.environ['API_SECRET'],
-    os.environ['ACCESS_TOKEN'],
-    os.environ['ACCESS_TOKEN_SECRET']
+    os.environ['TWITTER_API_KEY'],
+    os.environ['TWITTER_API_SECRET'],
+    os.environ['TWITTER_ACCESS_TOKEN'],
+    os.environ['TWITTER_ACCESS_SECRET']
 )
+
 api = tweepy.API(auth)
 
 # Get today’s date formatted like "May 22, 2025"
