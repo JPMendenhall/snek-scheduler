@@ -24,6 +24,8 @@ if os.path.exists(COOKIE_FILE):
     with open(COOKIE_FILE, "rb") as f:
         cookies = pickle.load(f)
     for cookie in cookies:
+        if "sameSite" not in cookie or cookie["sameSite"] not in ["Strict", "Lax", "None"]:
+            cookie["sameSite"] = "Lax"
         driver.add_cookie(cookie)
     driver.get(TWITTER_URL)
 else:
