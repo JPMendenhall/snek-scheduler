@@ -10,9 +10,11 @@ OPENSEA_CONTRACT = "0x22b0414cce0593ee1a87d83f91f569d505de9160"
 
 # Headless browser config
 options = Options()
+options.binary_location = "/usr/bin/chromium-browser"
 options.add_argument("--headless=new")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
+
 
 driver = webdriver.Chrome(options=options)
 driver.get("https://twitter.com/login")
