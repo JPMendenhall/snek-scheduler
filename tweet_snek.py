@@ -83,14 +83,13 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 file_input.send_keys(os.path.abspath(image_path))
                 time.sleep(4)
 
-                # Wait for tweet button and click it after scrolling
                 post_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='tweetButtonInline']"))
+                    EC.element_to_be_clickable((By.XPATH, "//button[@data-testid='tweetButton']"))
                 )
                 driver.execute_script("arguments[0].scrollIntoView(true);", post_button)
+                driver.save_screenshot("tweet_ready.png")
                 time.sleep(1)
                 post_button.click()
-
                 print("✅ Tweet posted.")
 
             except Exception as e:
