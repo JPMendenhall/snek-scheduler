@@ -83,9 +83,12 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 file_input.send_keys(os.path.abspath(image_path))
                 time.sleep(4)
 
-                post_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//button[@data-testid='tweetButton']"))
+                # Wait until tweet button is present AND enabled
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.find_element(By.XPATH, "//button[@data-testid='tweetButton']").is_enabled()
                 )
+
+                post_button = driver.find_element(By.XPATH, "//button[@data-testid='tweetButton']")
                 driver.execute_script("arguments[0].scrollIntoView(true);", post_button)
                 driver.save_screenshot("tweet_ready.png")
                 time.sleep(1)
