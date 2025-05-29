@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3.6.0
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v4.9.1
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -27,9 +27,9 @@ jobs:
       - name: Run tweet script
         run: python tweet_snek.py
 
-      - name: Upload debug output (always)
+      - name: Upload debug output
         if: always()
-        uses: actions/upload-artifact@f7ea0db53ff6dc347ef28b7a7e1fdbb8e7cb253c
+        uses: actions/upload-artifact@v3
         with:
           name: twitter-debug
           path: |
