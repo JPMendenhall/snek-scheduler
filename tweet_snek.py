@@ -9,7 +9,7 @@ IMAGE_FOLDER = "images"
 TWITTER_URL = "https://twitter.com/compose/tweet"
 OPENSEA_CONTRACT = "0x22b0414cce0593ee1a87d83f91f569d505de9160"
 
-# Setup headless Chrome
+# Set up headless Chrome
 options = Options()
 options.binary_location = "/usr/bin/chromium-browser"
 options.add_argument("--headless=new")
@@ -17,7 +17,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://twitter.com")  # Set cookie domain
+driver.get("https://twitter.com")  # must visit domain before loading cookies
 
 # Load cookies
 if os.path.exists(COOKIE_FILE):
@@ -75,7 +75,6 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 tweet_box.send_keys(tweet_text)
                 time.sleep(2)
 
-                # Upload image
                 file_input = driver.find_element(By.XPATH, "//input[@type='file']")
                 file_input.send_keys(os.path.abspath(image_path))
                 time.sleep(4)
@@ -84,7 +83,7 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 post_button.click()
                 print("✅ Tweet posted.")
             except Exception as e:
-                print(f"❌ Tweet failed: {e}")
+                print(f"❌ Tweet failed during post: {e}")
                 driver.save_screenshot("tweet_fail.png")
             break
 
