@@ -2,7 +2,7 @@ name: Post Snek to Twitter
 
 on:
   schedule:
-    - cron: '0 12 * * *'
+    - cron: '0 12 * * *'  # Daily at 12:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.6.0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v4.9.1
         with:
           python-version: '3.10'
 
@@ -26,3 +26,10 @@ jobs:
 
       - name: Run tweet script
         run: python tweet_snek.py
+
+      - name: Upload tweet screenshot
+        if: always()
+        uses: actions/upload-artifact@actions/upload-artifact@v3.1.3
+        with:
+          name: tweet-debug
+          path: tweet_ready.png
