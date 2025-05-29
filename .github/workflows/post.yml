@@ -1,54 +1,57 @@
-name: Daily Tweet Sneks
+name: Post Snek to Twitter
 
 on:
   schedule:
-    - cron: '0 12 * * *'  # Every day at 12pm UTC
+    - cron: '0 12 * * *' # 12:00 UTC daily
   workflow_dispatch:
 
 jobs:
-  tweet:
+  post:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.6.0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v4.9.1
         with:
           python-version: '3.10'
 
       - name: Install dependencies
         run: |
-          pip install selenium pandas
+          sudo apt update
+          sudo apt install -y chromium-browser chromium-chromedriver
+          pip install pandas selenium
 
-      - name: Install Chrome + Driver
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
-          if [ ! -e /usr/bin/google-chrome ]; then
-            sudo ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
-          else
-            echo "✔️ /usr/bin/google-chrome already exists, skipping symlink"
-          fi
-
-
-      - name: Run script
+      - name: Run tweet_snek.py
         run: python tweet_snek.py
 
       - name: Print Chrome version
         run: chromium-browser --version
 
-      - name: Debug Screenshot
+      - name: Capture screenshot on failure
         if: failure()
         run: |
           mkdir -p screenshots
-          mv /tmp/chrome* screenshots/ || true
-        continue-on-error: true
+          import datetime
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          
+          options = Options()
+          options.add_argument("--headless")
+          options.add_argument("--no-sandbox")
+          options.add_argument("--disable-dev-shm-usage")
+
+          driver = webdriver.Chrome(options=options)
+          driver.get("https://twitter.com")
+          driver.save_screenshot("screenshots/debug.png")
+          driver.quit()
+        shell: python
 
       - name: Upload screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: debug-screenshots
           path: screenshots
-

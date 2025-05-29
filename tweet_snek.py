@@ -16,7 +16,9 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://twitter.com")  # <-- Visit domain first before setting cookies
+
+# Load Twitter homepage to match cookie domain
+driver.get("https://twitter.com")
 
 # Load cookies
 if os.path.exists(COOKIE_FILE):
@@ -39,12 +41,11 @@ if os.path.exists(COOKIE_FILE):
         except Exception as e:
             print(f"❌ Failed to add cookie #{i+1} '{name}': {e}")
 
-    driver.get(TWITTER_URL)  # NOW it's safe to go to tweet page
+    driver.get(TWITTER_URL)
 else:
     print("❌ cookies.pkl not found.")
     driver.quit()
     exit()
-
 
 # Get today's tweet
 today = datetime.datetime.utcnow().strftime('%b %d, %Y')
