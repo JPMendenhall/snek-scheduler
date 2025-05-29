@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import csv, datetime, time, os, pickle
 
 CSV_FILE = "snek_captions.csv"
@@ -17,7 +19,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://twitter.com")  # must visit domain before loading cookies
+driver.get("https://twitter.com")  # Set cookie domain
 
 # Load cookies
 if os.path.exists(COOKIE_FILE):
@@ -46,11 +48,12 @@ else:
     driver.quit()
     exit()
 
-# Try to find tweet box
+# Wait for the tweet input container
 try:
-    time.sleep(5)
-    tweet_box = driver.find_element(By.CSS_SELECTOR, "div[aria-label='Tweet text']")
-except Exception as e:
+    tweet_box = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-testid='tweetTextarea_0']"))
+    )
+except Exception:
     print("❌ Tweet failed: Could not find tweet input box.")
     driver.save_screenshot("debug_tweet_page.png")
     with open("debug_page.html", "w", encoding="utf-8") as f:
@@ -58,7 +61,7 @@ except Exception as e:
     driver.quit()
     exit()
 
-# Get today's tweet row
+# Get today's tweet
 today = datetime.datetime.utcnow().strftime('%b %d, %Y')
 with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
     reader = csv.DictReader(csvfile)
