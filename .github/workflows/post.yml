@@ -26,12 +26,3 @@ jobs:
 
       - name: Run tweet script
         run: python tweet_snek.py
-
-      - name: Upload debug output
-        if: always()
-        uses: actions/upload-artifact@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c
-        with:
-          name: twitter-debug
-          path: |
-            debug_tweet_page.png
-            debug_page.html
