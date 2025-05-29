@@ -19,7 +19,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://twitter.com")  # Set cookie domain
+driver.get("https://twitter.com")  # Visit domain before setting cookies
 
 # Load cookies
 if os.path.exists(COOKIE_FILE):
@@ -48,7 +48,7 @@ else:
     driver.quit()
     exit()
 
-# Wait for the tweet input container
+# Wait for the tweet box
 try:
     tweet_box = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "div[data-testid='tweetTextarea_0']"))
@@ -73,6 +73,7 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
             image_path = os.path.join(IMAGE_FOLDER, file_name)
 
             tweet_text = f"{caption}\nhttps://opensea.io/assets/base/{OPENSEA_CONTRACT}/{token_id}"
+            print("Tweet text to be sent:", tweet_text)
 
             try:
                 tweet_box.send_keys(tweet_text)
@@ -82,9 +83,13 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 file_input.send_keys(os.path.abspath(image_path))
                 time.sleep(4)
 
-                post_button = driver.find_element(By.XPATH, "//div[@data-testid='tweetButtonInline']")
+                # Wait for tweet button and click
+                post_button = WebDriverWait(driver, 10).until(
+                    EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='tweetButtonInline']"))
+                )
                 post_button.click()
                 print("✅ Tweet posted.")
+
             except Exception as e:
                 print(f"❌ Tweet failed during post: {e}")
                 driver.save_screenshot("tweet_fail.png")
