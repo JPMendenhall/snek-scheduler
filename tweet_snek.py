@@ -90,6 +90,7 @@ with open(CSV_FILE, newline='', encoding='utf-8') as csvfile:
                 driver.execute_script("arguments[0].scrollIntoView(true);", post_button)
                 time.sleep(1)
                 post_button.click()
+
                 print("✅ Tweet posted.")
 
             except Exception as e:
