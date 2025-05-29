@@ -15,9 +15,8 @@ options.add_argument("--headless=new")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-
 driver = webdriver.Chrome(options=options)
-driver.get("https://twitter.com/login")
+driver.get("https://twitter.com")  # <-- Visit domain first before setting cookies
 
 # Load cookies
 if os.path.exists(COOKIE_FILE):
@@ -27,9 +26,8 @@ if os.path.exists(COOKIE_FILE):
     for i, cookie in enumerate(cookies):
         name = cookie.get("name", "unknown")
         original_same_site = cookie.get("sameSite", "")
-        normalized = original_same_site.capitalize()
+        normalized = original_same_site.capitalize() if isinstance(original_same_site, str) else ""
 
-        # Fix or skip invalid sameSite values
         if normalized not in ["Strict", "Lax", "None"]:
             print(f"⚠️ Skipping cookie #{i+1} ('{name}') due to invalid sameSite='{original_same_site}'")
             continue
@@ -40,7 +38,8 @@ if os.path.exists(COOKIE_FILE):
             print(f"✅ Added cookie #{i+1} '{name}' with sameSite='{cookie['sameSite']}'")
         except Exception as e:
             print(f"❌ Failed to add cookie #{i+1} '{name}': {e}")
-    driver.get(TWITTER_URL)
+
+    driver.get(TWITTER_URL)  # NOW it's safe to go to tweet page
 else:
     print("❌ cookies.pkl not found.")
     driver.quit()

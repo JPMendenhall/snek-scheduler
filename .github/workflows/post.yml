@@ -34,3 +34,21 @@ jobs:
 
       - name: Run script
         run: python tweet_snek.py
+
+      - name: Print Chrome version
+        run: chromium-browser --version
+
+      - name: Debug Screenshot
+        if: failure()
+        run: |
+          mkdir -p screenshots
+          mv /tmp/chrome* screenshots/ || true
+        continue-on-error: true
+
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: debug-screenshots
+          path: screenshots
+
