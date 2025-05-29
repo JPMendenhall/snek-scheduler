@@ -20,23 +20,26 @@ driver = webdriver.Chrome(options=options)
 driver.get("https://twitter.com/login")
 
 # Load cookies
-# Load cookies
 if os.path.exists(COOKIE_FILE):
     with open(COOKIE_FILE, "rb") as f:
         cookies = pickle.load(f)
 
     for i, cookie in enumerate(cookies):
+        name = cookie.get("name", "unknown")
         original_same_site = cookie.get("sameSite", "")
         normalized = original_same_site.capitalize()
-        valid_same_site = ["Strict", "Lax", "None"]
-        cookie["sameSite"] = normalized if normalized in valid_same_site else "Lax"
 
-        print(f"🧪 Cookie #{i+1}: name={cookie.get('name')} | original sameSite='{original_same_site}' → using '{cookie['sameSite']}'")
+        # Fix or skip invalid sameSite values
+        if normalized not in ["Strict", "Lax", "None"]:
+            print(f"⚠️ Skipping cookie #{i+1} ('{name}') due to invalid sameSite='{original_same_site}'")
+            continue
+        cookie["sameSite"] = normalized
 
         try:
             driver.add_cookie(cookie)
+            print(f"✅ Added cookie #{i+1} '{name}' with sameSite='{cookie['sameSite']}'")
         except Exception as e:
-            print(f"❌ Failed to add cookie #{i+1}: {e}")
+            print(f"❌ Failed to add cookie #{i+1} '{name}': {e}")
     driver.get(TWITTER_URL)
 else:
     print("❌ cookies.pkl not found.")
